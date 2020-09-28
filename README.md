@@ -19,4 +19,4 @@ Neural Netorks are trained using Pytorch 1.4 and Python 3.7
 
 # Acknowledgement
 The TD3 code was based on [TD3](https://github.com/sfujim/TD3)
-The SAC code was based on [SAC](https://github.com/denisyarats/pytorch_sac)
+The SAC code was based on [SAC1](https://github.com/denisyarats/pytorch_sac) and [SAC2](https://github.com/vitchyr/rlkit).
