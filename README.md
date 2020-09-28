@@ -1,5 +1,6 @@
 # FORK
 This repository contains the code accompanying the paper A Forward-Looking Actor From Model-free Reinforcement Learning.
+
 PyTorch implementation of FORK. If you use our code or data please cite the paper.
 
 TD3-FORK and SAC-FORK are tested on [Mujoco](http://www.mujoco.org/) continuous control tasks in [OpenAI gym](https://gym.openai.com/). 
