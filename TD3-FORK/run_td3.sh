@@ -27,5 +27,10 @@ do
 	python main_td3_fork.py \
 	--policy "TD3" \
 	--env "Humanoid-v3" \
-	--seed $i 
+	--seed $i
+
+	python main_td3_fork.py \
+	--policy "TD3" \
+	--env "BipedalWalker-v3" \
+	--seed $i
 done

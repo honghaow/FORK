@@ -1,0 +1,1 @@
+{"algorithm": "SYS_QRDW", "env": "BipedalWalker-v3", "sys_weight": 0.5, "sys_threshold": 0.01, "max_reward": 320, "fc1_units": 400, "fc2_units": 300}

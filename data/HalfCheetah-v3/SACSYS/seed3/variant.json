@@ -1,0 +1,1 @@
+{"algorithm": "SACSYS", "env": "HalfCheetah-v3", "sys_weight": 0.1, "sys_threshold": 0.2, "max_reward": 6000}

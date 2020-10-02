@@ -30,7 +30,7 @@ def eval_policy(policy, env_name,eval_episodes=10):
 if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--policy", default="TD3")                      # Policy name (TD3,or TD3_FORK)
+	parser.add_argument("--policy", default="TD3")                      # Policy name (TD3,or TD3_FORK,TD3_FORK_Q,TD3_FORK_DQ,TD3_FORK_S)
 	parser.add_argument("--env", default="HalfCheetah-v2")              # OpenAI gym environment name
 	parser.add_argument("--seed", default=0, type=int)                  # Sets Gym, PyTorch and Numpy seeds
 	parser.add_argument("--start_timesteps", default=1e4, type=int)     # Time steps initial random policy is used
@@ -52,21 +52,19 @@ if __name__ == "__main__":
 	parser.add_argument("--load_model", default="")                     # Model load file name, "" doesn't load, "default" uses file_name
 	parser.add_argument("--training_mode", default="Online")            #training_mode Offline or Online
 	parser.add_argument("--sys_weight", default=0.5,type=float)         # weight for FORK
+	parser.add_argument("--sys_weight2", default=0.4,type=float)        # weight for FORK-DQ
 	parser.add_argument("--base_weight", default=0.6,type=float)        # base weight if using dynamic_weight
 	parser.add_argument("--sys_threshold", default=0.020,type=float)    # threshold for FORK
 	parser.add_argument("--sys_dynamic_weight", default="False")        # whether use dynamic weight or not
 	args = parser.parse_args()
 
+	if args.sys_dynamic_weight == 'False':
+		args.policy = args.policy + '_F'
 	file_name = f"{args.policy}_{args.env}_{args.seed}_{args.training_mode}"
-	if args.sys_dynamic_weight == 'True':
-		file_name += f"_DW_{args.sys_dynamic_weight}"
 
 	print("---------------------------------------")
 	print(f"Policy: {args.policy}, Env: {args.env}, Seed: {args.seed}, Weight: {args.sys_weight},Training_mode: {args.training_mode}, Dynamic_weight: {args.sys_dynamic_weight}")
 	print("---------------------------------------")
-
-	if not os.path.exists("./results"):
-		os.makedirs("./results")
 
 	if args.save_model == "True" and not os.path.exists("./models"):
 		os.makedirs("./models")
@@ -89,7 +87,6 @@ if __name__ == "__main__":
 		"discount": args.discount,
 		"tau": args.tau,
 	}
-
 	# Initialize policy
 	if args.policy == "TD3":
 		# Target policy smoothing is scaled wrt the action scale
@@ -101,13 +98,15 @@ if __name__ == "__main__":
 			algorithm='TD3',
 			env=args.env,
 		)
-	elif args.policy == "TD3_FORK":
+	elif args.policy in ["TD3_FORK","TD3_FORK_F","TD3_FORK_DQ","TD3_FORK_DQ_F","TD3_FORK_Q","TD3_FORK_Q_F","TD3_FORK_S","TD3_FORK_S_F"]:
 		# Target policy smoothing is scaled wrt the action scale
 		kwargs["env"] = env
+		kwargs["policy"] = args.policy
 		kwargs["policy_noise"] = args.policy_noise * max_action
 		kwargs["noise_clip"] = args.noise_clip * max_action
 		kwargs["policy_freq"] = args.policy_freq
 		kwargs["sys_weight"] = args.sys_weight
+		kwargs["sys_weight2"] = args.sys_weight2
 		kwargs["sys_threshold"] = args.sys_threshold
 		kwargs["sys1_units"] = args.sys_neurons1
 		kwargs["sys2_units"] = args.sys_neurons2
@@ -116,7 +115,7 @@ if __name__ == "__main__":
 		policy = TD3_FORK.TD3_FORK(**kwargs)
 
 		variant = dict(
-			algorithm='TD3_FORK',
+			algorithm=args.policy,
 			env=args.env,
 			sys_weight=args.sys_weight,
 			sys_threshold=args.sys_threshold,
@@ -126,6 +125,9 @@ if __name__ == "__main__":
 			r1_units=args.r_neurons1,
 			r2_units=args.r_neurons2
 		)
+	else:
+		raise Exception("invaled policy!!!")
+
 	if not os.path.exists(f"./data/{args.env}/{args.policy}/seed{args.seed}"):
 		os.makedirs(f'./data/{args.env}/{args.policy}/seed{args.seed}')
 	with open(f'./data/{args.env}/{args.policy}/seed{int(args.seed)}/variant.json', 'w') as outfile:
@@ -179,7 +181,7 @@ if __name__ == "__main__":
 			ep_reward_list.append(episode_reward)
 			if args.sys_dynamic_weight == "True":
 				policy.sys_weight =  np.round((1 - np.clip(np.mean(ep_reward_list[-100:])/args.max_reward, 0, 1)),4) * base_weight
-			if args.policy == "TD3_FORK":
+			if args.policy in ["TD3_FORK","TD3_FORK_F","TD3_FORK_DQ","TD3_FORK_DQ_F","TD3_FORK_Q","TD3_FORK_Q_F","TD3_FORK_S","TD3_FORK_S_F"]:
 				print(f"Total T: {t+1} Episode Num: {episode_num+1} Episode T: {episode_timesteps} Reward: {episode_reward:.3f} Sysmodel_Loss: {policy.sysmodel_loss} Reward_loss: {policy.sysr_loss} Sys updated times: {policy.update_sys} Sys_weight: {policy.sys_weight}")
 				policy.update_sys = 0
 			else:

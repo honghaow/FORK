@@ -101,6 +101,7 @@ class TD3_FORK(object):
 	def __init__(
 		self,
 		env,
+		policy,
 		state_dim,
 		action_dim,
 		max_action,
@@ -114,10 +115,12 @@ class TD3_FORK(object):
 		noise_clip=0.5,
 		policy_freq=2,
 		sys_weight = 0.5,
+		sys_weight2 = 0.4,
 		sys_threshold = 0.020,
 	):
 
 		self.env = env
+		self.policy = policy
 
 		self.actor = Actor(state_dim, action_dim, max_action).to(device)
 		self.actor_target = copy.deepcopy(self.actor)
@@ -154,6 +157,7 @@ class TD3_FORK(object):
 		self.noise_clip = noise_clip
 		self.policy_freq = policy_freq
 		self.sys_weight = sys_weight
+		self.sys_weight2 = sys_weight2
 		self.sys_threshold = sys_threshold
 
 		self.total_it = 0
@@ -234,16 +238,34 @@ class TD3_FORK(object):
 				if s_flag == 1:
 					p_next_state = self.sysmodel(state, self.actor(state))
 					p_next_state = p_next_state.clamp(self.obs_lower_bound,self.obs_upper_bound)
-
-					p_next_r = self.sysr(state,p_next_state.detach(),self.actor(state))
 					actions2 = self.actor(p_next_state.detach())
-					p_next_state2 = self.sysmodel(p_next_state, self.actor(p_next_state.detach()))
-					p_next_state2 = p_next_state2.clamp(self.obs_lower_bound,self.obs_upper_bound)
-					p_next_r2 = self.sysr(p_next_state.detach(),p_next_state2.detach(),self.actor(p_next_state.detach()))
-					actions3 = self.actor(p_next_state2.detach())
 
-					actor_loss2 =  self.critic.Q1(p_next_state2.detach(),actions3)
-					actor_loss3 =  -(p_next_r + self.discount * p_next_r2 + self.discount ** 2 * actor_loss2).mean()
+					if self.policy in ['TD3_FORK_Q','TD3_FORK_Q_F','TD3_FORK_DQ','TD3_FORK_DQ_F']:
+						actor_loss2 =  self.critic.Q1(p_next_state.detach(),actions2)
+
+						if self.policy in ['TD3_FORK_DQ','TD3_FORK_DQ_F']:
+							p_next_state2 = self.sysmodel(p_next_state, self.actor(p_next_state.detach()))
+							p_next_state2 = p_next_state2.clamp(self.obs_lower_bound,self.obs_upper_bound)
+							actions3 = self.actor(p_next_state2.detach())
+							actor_loss22 =  self.critic.Q1(p_next_state2.detach(),actions3)
+							actor_loss3 =  - actor_loss2.mean() - self.sys_weight2 * actor_loss22.mean()
+						else:
+							actor_loss3 =  - actor_loss2.mean()
+
+					elif self.policy in ['TD3_FORK_S','TD3_FORK_S_F','TD3_FORK','TD3_FORK_F']:
+						p_next_r = self.sysr(state,p_next_state.detach(),self.actor(state))
+						if self.policy in ['TD3_FORK_S','TD3_FORK_S_F']:
+							actor_loss2 =  self.critic.Q1(p_next_state.detach(),actions2)
+							actor_loss3 =  -(p_next_r + self.discount * actor_loss2).mean()
+						else:
+
+							p_next_state2 = self.sysmodel(p_next_state, self.actor(p_next_state.detach()))
+							p_next_state2 = p_next_state2.clamp(self.obs_lower_bound,self.obs_upper_bound)
+							p_next_r2 = self.sysr(p_next_state.detach(),p_next_state2.detach(),self.actor(p_next_state.detach()))
+							actions3 = self.actor(p_next_state2.detach())
+
+							actor_loss2 =  self.critic.Q1(p_next_state2.detach(),actions3)
+							actor_loss3 =  -(p_next_r + self.discount * p_next_r2 + self.discount ** 2 * actor_loss2).mean()
 					actor_loss =   (actor_loss1 + self.sys_weight * actor_loss3)
 					self.update_sys += 1
 				else:
