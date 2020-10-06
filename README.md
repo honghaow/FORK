@@ -1,5 +1,5 @@
 # FORK
-This repository contains the code accompanying the paper A Forward-Looking Actor From Model-free Reinforcement Learning. [Paper](https://arxiv.org/abs/2010.01652)
+This repository contains the code accompanying the [Paper](https://arxiv.org/abs/2010.01652) A Forward-Looking Actor From Model-free Reinforcement Learning. 
 
 PyTorch implementation of FORK. If you use our code or data please cite the paper.
 
