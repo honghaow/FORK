@@ -54,5 +54,3 @@ If you use our code or data please cite the paper.
 
 The TD3 code was based on [TD3](https://github.com/sfujim/TD3)
 The SAC code was based on [SAC1](https://github.com/denisyarats/pytorch_sac) and [SAC2](https://github.com/vitchyr/rlkit).
-
-1. 
