@@ -125,7 +125,9 @@ class SAC_FORK(object):
             pi3, log_pi3, _ = self.policy.sample(p_next_state2.detach())
             qf3_pi, qf4_pi = self.critic(p_next_state2.detach(), pi3)
             min_qf_pi2 = torch.min(qf3_pi, qf4_pi)
-            sys_loss = -(p_next_r + self.gamma * p_next_r2 + self.gamma ** 2 * min_qf_pi2).mean()
+
+            #sys_loss = (-p_next_r -self.gamma * p_next_r2 + self.gamma ** 2 * ((self.alpha * log_pi3) - min_qf_pi2)).mean()
+            sys_loss = (-p_next_r + self.alpha * log_pi - self.gamma * (p_next_r2 - self.alpha * log_pi2)  + self.gamma ** 2 * ((self.alpha * log_pi3) - min_qf_pi2)).mean()
             policy_loss += self.sys_weight * sys_loss
             self.update_sys += 1
 
