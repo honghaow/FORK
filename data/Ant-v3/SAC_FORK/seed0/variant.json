@@ -1,1 +1,1 @@
-{"algorithm": "SAC_FORK", "env": "Ant-v3"}
+{"algorithm": "SAC_FORK", "env": "Ant-v3", "sys_weight": 0.6, "sys_threshold": 0.02, "max_reward": 5200, "sys_hidden_size": 512, "sysr_hidden_size": 512}

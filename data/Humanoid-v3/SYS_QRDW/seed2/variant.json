@@ -1,1 +1,0 @@
-{"algorithm": "SYS_QRDW", "env": "Humanoid-v3", "sys_weight": 0.5, "sys_threshold": 0.2, "max_reward": 5200, "fc1_units": 1024, "fc2_units": 1024}

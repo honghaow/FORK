@@ -1,0 +1,1 @@
+{"algorithm": "SAC_FORK", "env": "BipedalWalker-v3", "sys_weight": 0.6, "sys_threshold": 0.01, "max_reward": 320, "sys_hidden_size": 512, "sysr_hidden_size": 512}

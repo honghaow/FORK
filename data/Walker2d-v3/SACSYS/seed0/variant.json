@@ -1,1 +1,0 @@
-{"algorithm": "SACSYS", "env": "Walker2d-v3", "sys_weight": 0.1, "sys_threshold": 0.15, "max_reward": 3000}
