@@ -2,7 +2,7 @@
 
 Author's PyTorch implementation of FORK: A Forward-Looking Actor For Model-Free Reinforcement Learning. The paper can be found [here](https://arxiv.org/pdf/2010.01652.pdf).
 
-We propose a new type of Actor, named forward-looking Actor or FORK for short, for Actor-Critic algorithms. 
+We proposed a new type of Actor, named forward-looking Actor or FORK for short, for Actor-Critic algorithms. 
 
 FORK can be easily integrated into a model-free Actor-Critic algorithm.
 
